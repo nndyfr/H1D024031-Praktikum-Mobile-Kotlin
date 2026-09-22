@@ -8,31 +8,31 @@
 ---
 
 ## 📝 Tugas Pertemuan 1
-**Tanggal**: Selasa, 1 September 2026
+**Tanggal**: Rabu, 2 September 2026
 
 ![Tugas Pertemuan 1](docs/tugas-1.jpeg)
 
 **Kesimpulan Praktikum:**  
-Pada pertemuan pertama, praktikum memberikan pemahaman dasar mengenai konsep pengembangan aplikasi mobile. Mahasiswa dapat mengenali struktur proyek, alur kerja, serta pentingnya konsistensi dalam penulisan kode agar aplikasi mudah dikembangkan dan dipelihara.
+Pertemuan pertama berfokus pada inisialisasi awal proyek dan dasar pemrograman Jetpack Compose.
 
 ---
 
 ## 📝 Tugas Pertemuan 2
-**Tanggal**: Selasa, 8 September 2026
+**Tanggal**: Rabu, 9 September 2026
 
 ![Tugas Pertemuan 2 Bagian 1](docs/tugas-2a.jpeg)
 ![Tugas Pertemuan 2 Bagian 2](docs/tugas-2b.jpeg)
 
 **Kesimpulan Praktikum:**  
-Pertemuan kedua menekankan pada implementasi fitur interaktif dalam aplikasi mobile. Mahasiswa belajar bagaimana menghubungkan antarmuka dengan logika program sehingga aplikasi dapat merespons input pengguna secara dinamis dan memberikan pengalaman yang lebih baik.
+Pertemuan kedua berfokus pada implementasi komponen Material Design 3 dan pembuatan Form.
 
 ---
 
 ## 📝 Tugas Pertemuan 3
-**Tanggal**: Selasa, 15 September 2026
+**Tanggal**: Rabu, 16 September 2026
 
 ![Tugas Pertemuan 3 Bagian 1](docs/tugas-3a.jpeg)
 ![Tugas Pertemuan 3 Bagian 2](docs/tugas-3b.jpeg)
 
 **Kesimpulan Praktikum:**  
-Pertemuan ketiga membuka wawasan tentang pengembangan aplikasi mobile yang lebih kompleks. Mahasiswa belajar bagaimana mengintegrasikan berbagai komponen dan fitur untuk menciptakan aplikasi yang lebih lengkap dan bermanfaat.
+Pertemuan ketiga berfokus pada penerapan pembuatan list data secara dinamis menggunakan Lazy Layouts.
