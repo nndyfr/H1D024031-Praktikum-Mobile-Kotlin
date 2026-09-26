@@ -1,5 +1,6 @@
 package com.pemob.nindyaalif.ui.screen
 
+import android.content.res.Configuration
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -12,11 +13,15 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -25,7 +30,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.draw.clip
+import androidx.navigation.NavController
+import kotlinx.coroutines.delay
 import com.pemob.nindyaalif.R
 import com.pemob.nindyaalif.data.dummy.DummyData
 import com.pemob.nindyaalif.data.model.Category
@@ -120,17 +126,60 @@ fun CategoryItem(category: Category, isSelected: Boolean, onClick: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DaftarProductScreen() {
-    var selectedCategoryId by remember { mutableStateOf(DummyData.categories.firstOrNull()?.id) }
+fun DaftarProdukScreen(navController: NavController? = null) {
+    var selectedCategoryId by rememberSaveable { mutableStateOf(DummyData.categories.firstOrNull()?.id) }
+    var searchQuery by rememberSaveable { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+    var filteredProducts by remember { mutableStateOf(emptyList<Product>()) }
 
-    val filteredProducts = if (selectedCategoryId != null) {
-        DummyData.products.filter { it.category_id == selectedCategoryId }
-    } else {
-        DummyData.products
+    LaunchedEffect(key1 = selectedCategoryId, key2 = searchQuery) {
+        isLoading = true
+
+        delay(1000)
+
+        val filteredByCategory = if (selectedCategoryId != null) {
+            DummyData.products.filter { it.category_id == selectedCategoryId }
+        } else DummyData.products
+
+        filteredProducts = if (searchQuery.isBlank()) {
+            filteredByCategory
+        } else {
+            filteredByCategory.filter { it.name.contains(searchQuery, ignoreCase = true) }
+        }
+
+        isLoading = false
     }
 
-    val context = LocalContext.current
+    StatelessDaftarProduct(
+        categories = DummyData.categories,
+        selectedCategoryId = selectedCategoryId,
+        onCategorySelected = { selectedCategoryId = it },
+        searchQuery = searchQuery,
+        onSearchQueryChange = { searchQuery = it },
+        isLoading = isLoading,
+        products = filteredProducts,
+        onProductClick = { product ->
+            navController?.navigate("detail/${product.id}")
+        },
+        onContactUsClick = {
+            navController?.navigate("hubungi_kami")
+        }
+    )
+}
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun StatelessDaftarProduct(
+    categories: List<Category>,
+    selectedCategoryId: Int?,
+    onCategorySelected: (Int) -> Unit,
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+    isLoading: Boolean,
+    products: List<Product>,
+    onProductClick: (Product) -> Unit,
+    onContactUsClick: () -> Unit = {}
+){
     Scaffold(
         topBar = {
             TopAppBar(
@@ -141,10 +190,38 @@ fun DaftarProductScreen() {
                     actionIconContentColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 actions = {
-                    IconButton(onClick = { /* TODO */ }) {
+                    IconButton(onClick = { /* TODO: Keranjang */ }) {
                         Icon(
                             imageVector = Icons.Outlined.ShoppingCart,
                             contentDescription = "Cart"
+                        )
+                    }
+                    var expanded by remember { mutableStateOf(false) }
+
+                    IconButton(onClick = { expanded = true }) {
+                        Icon(
+                            imageVector = Icons.Default.MoreVert,
+                            contentDescription = "Menu",
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Hubungi Kami") },
+                            onClick = {
+                                expanded = false
+                                onContactUsClick()
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Email,
+                                    contentDescription = "Email"
+                                )
+                            }
                         )
                     }
                 }
@@ -156,6 +233,16 @@ fun DaftarProductScreen() {
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = onSearchQueryChange,
+                label = { Text("Cari produk...") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                singleLine = true
+            )
+
             Text(
                 text = "Kategori Produk",
                 style = MaterialTheme.typography.titleLarge,
@@ -166,11 +253,11 @@ fun DaftarProductScreen() {
                 contentPadding = PaddingValues(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(DummyData.categories) { category ->
+                items(categories) { category ->
                     CategoryItem(
                         category = category,
                         isSelected = category.id == selectedCategoryId,
-                        onClick = { selectedCategoryId = category.id }
+                        onClick = { onCategorySelected(category.id) }
                     )
                 }
             }
@@ -182,16 +269,38 @@ fun DaftarProductScreen() {
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
 
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(count = 2),
-                contentPadding = PaddingValues(all = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(filteredProducts) { product ->
-                    ProductItemCard(product = product) {
-                        Toast.makeText(context, "Clicked: ${product.name}", Toast.LENGTH_SHORT).show()
+            if (isLoading) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        CircularProgressIndicator()
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text("Mencari data...")
+                    }
+                }
+            } else {
+                if (products.isEmpty()) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("Produk tidak ditemukan.")
+                    }
+                } else {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(count = 2),
+                        contentPadding = PaddingValues(all = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        items(products) { product ->
+                            ProductItemCard(product = product) {
+                                onProductClick(product)
+                            }
+                        }
                     }
                 }
             }
@@ -222,16 +331,16 @@ fun PreviewCategory() {
 
 @Preview(showBackground = true, name = "Light Mode")
 @Composable
-fun PreviewDaftarProductScreenLight() {
+fun PreviewDaftarProdukScreenLight() {
     JualanTheme {
-        DaftarProductScreen()
+        DaftarProdukScreen()
     }
 }
 
-@Preview(showBackground = true, name = "Dark Mode", uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@Preview(showBackground = true, name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun PreviewDaftarProductScreenDark() {
+fun PreviewDaftarProdukScreenDark() {
     JualanTheme {
-        DaftarProductScreen()
+        DaftarProdukScreen()
     }
 }

@@ -36,3 +36,15 @@ Pertemuan kedua berfokus pada implementasi komponen Material Design 3 dan pembua
 
 **Kesimpulan Praktikum:**  
 Pertemuan ketiga berfokus pada penerapan pembuatan list data secara dinamis menggunakan Lazy Layouts.
+
+---
+
+## 📝 Tugas Pertemuan 4
+**Tanggal**: Rabu, 23 September 2026
+
+![Tugas Pertemuan 4 Bagian 1](docs/tugas-4a.jpeg)
+![Tugas Pertemuan 4 Bagian 2](docs/tugas-4b.jpeg)
+![Tugas Pertemuan 4 Bagian 3](docs/tugas-4c.jpeg)
+
+**Kesimpulan Praktikum:**  
+Pertemuan keempat berfokus pada implementasi Jetpack Navigation untuk menghubungkan antar halaman (Daftar Produk ke Detail Produk dengan argumen `productId`, serta halaman Form Hubungi Kami via Dropdown Menu).
